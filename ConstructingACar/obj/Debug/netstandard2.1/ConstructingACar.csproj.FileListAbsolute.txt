@@ -1,0 +1,8 @@
+C:\dev\CodeWars\ConstructingACar\ConstructingACar\bin\Debug\netstandard2.1\ConstructingACar.deps.json
+C:\dev\CodeWars\ConstructingACar\ConstructingACar\bin\Debug\netstandard2.1\ConstructingACar.dll
+C:\dev\CodeWars\ConstructingACar\ConstructingACar\bin\Debug\netstandard2.1\ConstructingACar.pdb
+C:\dev\CodeWars\ConstructingACar\ConstructingACar\obj\Debug\netstandard2.1\ConstructingACar.csprojAssemblyReference.cache
+C:\dev\CodeWars\ConstructingACar\ConstructingACar\obj\Debug\netstandard2.1\ConstructingACar.AssemblyInfoInputs.cache
+C:\dev\CodeWars\ConstructingACar\ConstructingACar\obj\Debug\netstandard2.1\ConstructingACar.AssemblyInfo.cs
+C:\dev\CodeWars\ConstructingACar\ConstructingACar\obj\Debug\netstandard2.1\ConstructingACar.dll
+C:\dev\CodeWars\ConstructingACar\ConstructingACar\obj\Debug\netstandard2.1\ConstructingACar.pdb
