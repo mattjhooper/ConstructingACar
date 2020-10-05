@@ -49,11 +49,22 @@ namespace ConstructingACar
             get { return engine.IsRunning; }
         }
 
+        private void ElapseSecond()
+        {
+            if (EngineIsRunning)
+            {
+                onBoardComputer.ElapseSecond();    
+            }
+        }
+
         public void BrakeBy(int speed) // car #2
         {
             Console.WriteLine($"BrakeBy {speed}");
-            drivingProcessor.ReduceSpeed(drivingProcessor.ActualSpeed - Math.Min(speed, MAX_BRAKE));
-            onBoardComputer.ElapseSecond();
+             if (EngineIsRunning)
+            {
+                drivingProcessor.ReduceSpeed(drivingProcessor.ActualSpeed - Math.Min(speed, MAX_BRAKE));
+                ElapseSecond();
+            }
         }
 
         public void Accelerate(int speed) // car #2
@@ -72,15 +83,15 @@ namespace ConstructingACar
 
                     engine.Consume(drivingProcessor.ActualConsumption);
                 }
+                ElapseSecond();
             }
-            onBoardComputer.ElapseSecond();
         }
 
         public void EngineStart()
         {
             Console.WriteLine($"Car EngineStart called");
             //onBoardComputer.TripReset();
-            onBoardComputer.ElapseSecond();
+            onBoardComputer.ElapseSecond();   
             engine.Start();
         }
 
@@ -88,8 +99,8 @@ namespace ConstructingACar
         {
             Console.WriteLine($"Car EngineStop called");
             engine.Stop();
+            onBoardComputer.ElapseSecond();   
             onBoardComputer.TripReset();
-            onBoardComputer.ElapseSecond();
         }
 
         public void FreeWheel() // car #2
@@ -103,7 +114,7 @@ namespace ConstructingACar
             }
             else
             {
-                onBoardComputer.ElapseSecond();
+                ElapseSecond();
             }
         }
 
@@ -118,7 +129,7 @@ namespace ConstructingACar
         {
             // Console.WriteLine($"Car is RunningIdle");
             engine.Consume(drivingProcessor.ActualConsumption);
-            onBoardComputer.ElapseSecond();
+            ElapseSecond();
         }
     }
 
@@ -308,9 +319,9 @@ namespace ConstructingACar
 
         public int TotalDrivenDistance { get; private set; } = 0;
 
-        public double TripAverageSpeed { get { return TripDrivingTime == 0 ? 0 : _tripSpeed / TripDrivingTime; } }
+        public double TripAverageSpeed { get { return CalculateAverageSpeed(TripDrivingTime, TripDrivenDistance); } }
 
-        public double TotalAverageSpeed { get { return TotalDrivingTime == 0 ? 0 : _totalSpeed / TotalDrivingTime; } }
+        public double TotalAverageSpeed { get { return CalculateAverageSpeed(TotalDrivingTime, TotalDrivenDistance); } }
 
         public int ActualSpeed { get { return _drivingProcessor.ActualSpeed; } }
 
@@ -345,6 +356,11 @@ namespace ConstructingACar
             return realTime == 0 ? 0 : consumptionByTimeSum / realTime;
         }
 
+        private double CalculateAverageSpeed(int DrivingTime, int DrivenDistance)
+        {
+            return DrivingTime == 0 ? 0d : ((double)DrivenDistance / 100000) / ((double)DrivingTime / 3600);
+        }
+
         private int CalculateEstimatedRange()
         {
             int EstimatedRange = 0;
@@ -362,7 +378,7 @@ namespace ConstructingACar
             return EstimatedRange;
         }
 
-        private double _tripDistanceKM = 0;
+        //private double _tripDistanceKM = 0;
 
         public void ElapseSecond()
         {
@@ -383,7 +399,7 @@ namespace ConstructingACar
                 TotalDrivenDistance += (distanceInElapsedSecondInCentMetres);
 
                 double distanceInElapsedSecond = ((double)_drivingProcessor.ActualSpeed) / 3600;
-                _tripDistanceKM += distanceInElapsedSecond;
+                //_tripDistanceKM += distanceInElapsedSecond;
 
             }
             ActualConsumptionByDistance = TripDrivingTime == 0 ? double.NaN : Math.Round(secondsRequiredToDrive100Km * ActualConsumptionByTime, 1);
@@ -415,13 +431,14 @@ namespace ConstructingACar
 
         public void TotalReset()
         {
-            TripReset();
+            //TripReset();
             TotalRealTime = 0;
             TotalDrivingTime = 0;
+            TotalDrivenDistance = 0;
             _totalSpeed = 0;
             _totalConsumptionByTimeSum = 0;
             _totalConsumptionByDistanceSum = 0;
-            TotalDrivenDistance = 0;
+            TotalAverageConsumptionByTime = 0;
         }
     }
 
@@ -432,23 +449,23 @@ namespace ConstructingACar
         {
             _onBoardComputer = onBoardComputer;
         }
-        public int TripRealTime { get { return _onBoardComputer.TripRealTime; } }
+         public int TripRealTime { get { Console.WriteLine("TripRealTime"); return _onBoardComputer.TripRealTime; } }
 
-        public int TripDrivingTime { get { return _onBoardComputer.TripDrivingTime; } }
+        public int TripDrivingTime { get { Console.WriteLine("TripDrivingTime"); return _onBoardComputer.TripDrivingTime; } }
 
         public double TripDrivenDistance { get { return Math.Round(((double)_onBoardComputer.TripDrivenDistance / 100000), 2); } }
 
-        public int TotalRealTime { get { return _onBoardComputer.TotalRealTime; } }
+        public int TotalRealTime { get { Console.WriteLine("TotalRealTime"); return _onBoardComputer.TotalRealTime; } }
 
-        public int TotalDrivingTime { get { return _onBoardComputer.TotalDrivingTime; } }
+        public int TotalDrivingTime {  get { Console.WriteLine("TotalRealTime"); return _onBoardComputer.TotalDrivingTime; } }
 
         public double TotalDrivenDistance { get { return Math.Round(((double)_onBoardComputer.TotalDrivenDistance / 100000), 2); } }
 
         public int ActualSpeed { get { return _onBoardComputer.ActualSpeed; } }
 
-        public double TripAverageSpeed { get { return _onBoardComputer.TripAverageSpeed; } }
+        public double TripAverageSpeed { get { return Math.Round(_onBoardComputer.TripAverageSpeed, 1); } }
 
-        public double TotalAverageSpeed { get { return _onBoardComputer.TotalAverageSpeed; } }
+        public double TotalAverageSpeed { get { return Math.Round(_onBoardComputer.TotalAverageSpeed, 1); } }
 
         public double ActualConsumptionByTime { get { return _onBoardComputer.ActualConsumptionByTime; } }
 
@@ -456,7 +473,7 @@ namespace ConstructingACar
 
         public double TripAverageConsumptionByTime { get { Console.WriteLine("TripAverageConsumptionByTime"); return Math.Round(_onBoardComputer.TripAverageConsumptionByTime, 5); } }        
 
-        public double TotalAverageConsumptionByTime { get { return Math.Round(_onBoardComputer.TotalAverageConsumptionByTime, 5); } }
+        public double TotalAverageConsumptionByTime { get { Console.WriteLine("TotalAverageConsumptionByTime"); return Math.Round(_onBoardComputer.TotalAverageConsumptionByTime, 5); } }
 
         public double TripAverageConsumptionByDistance { get { return Math.Round(_onBoardComputer.TripAverageConsumptionByDistance, 1); } }
 
@@ -467,13 +484,13 @@ namespace ConstructingACar
         public void TripReset()
         {
             Console.WriteLine("TripReset");
-            _onBoardComputer.TripReset();
+            _onBoardComputer.TripReset();            
         }
 
         public void TotalReset()
         {
-            Console.WriteLine("TripReset"); 
-            _onBoardComputer.TotalReset();
+            Console.WriteLine("TotalReset"); 
+            _onBoardComputer.TotalReset();            
         }
     }
 }

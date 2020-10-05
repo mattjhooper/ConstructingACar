@@ -12,14 +12,17 @@ namespace ConstructingACar.Exe
 
             car.EngineStart();
 
-            car.Accelerate(10);
+            car.Accelerate(30);
+            car.Accelerate(30);
+            car.Accelerate(30);
+            car.onBoardComputerDisplay.TripReset();
+            Console.WriteLine($"TripAverageConsumptionByTime: {car.onBoardComputerDisplay.TripAverageConsumptionByTime}");
 
-            car.BrakeBy(10);
-
-            car.EngineStop();
-            car.EngineStart();
-
-            Console.WriteLine($"ActualConsumptionByDistance: {car.onBoardComputerDisplay.ActualConsumptionByDistance}");
+            car.Accelerate(30);
+            car.Accelerate(30);
+            car.Accelerate(30);                        
+            car.onBoardComputerDisplay.TripReset();
+            Console.WriteLine($"TripAverageConsumptionByTime: {car.onBoardComputerDisplay.TripAverageConsumptionByTime}");            
         }
     }
 }

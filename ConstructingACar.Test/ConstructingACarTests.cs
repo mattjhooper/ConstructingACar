@@ -185,6 +185,30 @@ namespace ConstructingACar.Test
         }
 
         [Test]
+        public void TestAverageSpeed2()
+        {
+            var car = new Car();
+
+            car.EngineStart();
+
+            car.RunningIdle();
+            car.RunningIdle();
+
+            car.Accelerate(30);
+            car.Accelerate(30);
+            car.Accelerate(30);
+            car.Accelerate(30);
+            car.Accelerate(30);
+
+            car.BrakeBy(10);
+            car.BrakeBy(10);
+            car.BrakeBy(10);
+
+            Assert.AreEqual(21.4, car.onBoardComputerDisplay.TripAverageSpeed, "Wrong Trip-Average-Speed.");
+           // Assert.AreEqual(18, car.onBoardComputerDisplay.TotalAverageSpeed, "Wrong Total-Average-Speed.");
+        }
+
+        [Test]
         public void TestAverageSpeedAfterTripReset()
         {
             var car = new Car();
@@ -406,12 +430,24 @@ namespace ConstructingACar.Test
             car.Accelerate(30);
             car.onBoardComputerDisplay.TripReset();
             Assert.AreEqual(0, car.onBoardComputerDisplay.TripAverageConsumptionByTime, "Wrong Trip-Average-Consumption-By-Time.");
+            Assert.AreEqual(0.0015d, car.onBoardComputerDisplay.TotalAverageConsumptionByTime, "Wrong Total-Average-Consumption-By-Time.");
 
             car.Accelerate(30);
             car.Accelerate(30);
             car.Accelerate(30);                        
+            car.onBoardComputerDisplay.TotalReset();
             Assert.AreEqual(0.002d, car.onBoardComputerDisplay.TripAverageConsumptionByTime, "Wrong Trip-Average-Consumption-By-Time.");
-            car.onBoardComputerDisplay.TripReset();
+            Assert.AreEqual(0, car.onBoardComputerDisplay.TotalAverageConsumptionByTime, "Wrong Total-Average-Consumption-By-Time.");
+        }
+
+        [Test]
+        public void TestRealAndDrivingTimeBeforeStartingBrakeBy10()
+        {
+            var car = new Car();
+
+            car.BrakeBy(10);
+
+            Assert.AreEqual(0, car.onBoardComputerDisplay.TripRealTime, "Wrong Trip-Real-Time!");
         }
     }
 }
