@@ -449,5 +449,42 @@ namespace ConstructingACar.Test
 
             Assert.AreEqual(0, car.onBoardComputerDisplay.TripRealTime, "Wrong Trip-Real-Time!");
         }
+
+        [Test]
+        public void TestEstimatedRangeAfterDrivingOptimumSpeedForLowerThan100Seconds()
+        {
+            var car = new Car();
+
+            car.EngineStart();
+
+            Enumerable.Range(0, 50).ToList().ForEach(c => car.Accelerate(100));
+
+            Assert.AreEqual(310, car.onBoardComputerDisplay.EstimatedRange, "Wrong Estimated-Range.");
+        }
+
+        [Test]
+        public void TestEstimatedRangeBeforeDriving()
+        {
+            var car = new Car();
+
+            car.EngineStart();
+
+            Assert.AreEqual(417, car.onBoardComputerDisplay.EstimatedRange, "Wrong Estimated-Range.");
+        }
+
+        [Test]
+        public void Car3RandomTests()
+        {
+            var car = new Car();
+
+            car.EngineStart();
+
+            Enumerable.Range(0, 10).ToList().ForEach(c => car.Accelerate(29));
+
+            Assert.AreEqual(0.00182d, car.onBoardComputerDisplay.TripAverageConsumptionByTime, "Wrong Trip-Average-Consumption-By-Time");
+            Assert.AreEqual(0.00182d, car.onBoardComputerDisplay.TotalAverageConsumptionByTime, "Wrong Total-Average-Consumption-By-Time");
+            Assert.AreEqual(30.7d, car.onBoardComputerDisplay.TripAverageConsumptionByDistance, "Wrong Trip-Average-Consumption-By-Distance");
+            Assert.AreEqual(30.7d, car.onBoardComputerDisplay.TotalAverageConsumptionByDistance, "Wrong Total-Average-Consumption-By-Distance");
+        }
     }
 }

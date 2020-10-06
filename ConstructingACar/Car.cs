@@ -365,17 +365,26 @@ namespace ConstructingACar
         {
             int EstimatedRange = 0;
             // remove the oldest consumption value and add the current one
-            _consumptionForLast100Seconds.Dequeue();
-            _consumptionForLast100Seconds.Enqueue(_drivingProcessor.ActualConsumption);
-            var totalConsumption = _consumptionForLast100Seconds.Sum(x => x);
+            // _consumptionForLast100Seconds.Dequeue();
+            // _consumptionForLast100Seconds.Enqueue(_drivingProcessor.ActualConsumption);
+            // var totalConsumption = _consumptionForLast100Seconds.Sum(x => x);
 
-            double secondsOfFuelRemaining = 100 * _fuelTank.FillLevel / totalConsumption;
+            // double secondsOfFuelRemaining = 100 * _fuelTank.FillLevel / totalConsumption;
 
-            EstimatedRange = (int)Math.Round((secondsOfFuelRemaining / 3600) * _drivingProcessor.ActualSpeed);
+            // EstimatedRange = (int)Math.Round((secondsOfFuelRemaining / 3600) * _drivingProcessor.ActualSpeed);
 
-            // Console.WriteLine($"totalConsumption: {totalConsumption}, EstimatedRange: {EstimatedRange}");
+            //Console.WriteLine($"AverageConsumption: {_consumptionForLast100Seconds.Sum(x => x)}, FillLevel: {_fuelTank.FillLevel}");
+            if (_drivingProcessor.ActualSpeed > 0)
+            {
+                // remove the oldest consumption value and add the current one
+                _consumptionForLast100Seconds.Dequeue();
+                double ltrPerKM = _drivingProcessor.ActualConsumption * (1 / ((double)_drivingProcessor.ActualSpeed / 3600));
+                _consumptionForLast100Seconds.Enqueue(ltrPerKM);           
+            }
+            EstimatedRange = (int)Math.Round(_fuelTank.FillLevel / _consumptionForLast100Seconds.Average(x => x));
 
             return EstimatedRange;
+           // return (int)Math.Round(_fuelTank.FillLevel / _consumptionForLast100Seconds.Average(x => x));
         }
 
         //private double _tripDistanceKM = 0;
