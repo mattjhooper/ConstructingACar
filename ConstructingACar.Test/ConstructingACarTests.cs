@@ -499,5 +499,17 @@ namespace ConstructingACar.Test
 
             Assert.AreEqual(26.5d, car.onBoardComputerDisplay.TripAverageSpeed, "Wrong Trip-Average-Speed.");
         }
+
+        [Test]
+        public void Car5RandomTests()
+        {
+            var car = new Car();
+
+            car.EngineStart();
+
+            Enumerable.Range(0, 13).ToList().ForEach(c => car.Accelerate(25));
+
+            Assert.AreEqual(23.5d, car.onBoardComputerDisplay.TripAverageSpeed, "Wrong Trip-Average-Speed.");
+        }
     }
 }

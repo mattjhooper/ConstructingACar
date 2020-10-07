@@ -5,7 +5,7 @@ using static ConstructingACar.Global.Globals;
 
 namespace ConstructingACar
 {
-    public class Car : ICar
+   public class Car : ICar
     {
         public IDrivingInformationDisplay drivingInformationDisplay; // car #2
 
@@ -60,7 +60,7 @@ namespace ConstructingACar
         public void BrakeBy(int speed) // car #2
         {
             Console.WriteLine($"BrakeBy {speed}");
-             if (EngineIsRunning)
+            if (EngineIsRunning)
             {
                 drivingProcessor.ReduceSpeed(drivingProcessor.ActualSpeed - Math.Min(speed, MAX_BRAKE));
                 ElapseSecond();
@@ -90,7 +90,6 @@ namespace ConstructingACar
         public void EngineStart()
         {
             Console.WriteLine($"Car EngineStart called");
-            //onBoardComputer.TripReset();
             onBoardComputer.ElapseSecond();   
             engine.Start();
         }
@@ -122,7 +121,6 @@ namespace ConstructingACar
         {
             Console.WriteLine($"Car Refuel called with {liters} liters");
             fuelTank.Refuel(liters);
-            //onBoardComputer.ElapseSecond();
         }
 
         public void RunningIdle()
@@ -182,14 +180,12 @@ namespace ConstructingACar
 
         public void IncreaseSpeedTo(int speed)
         {
-            //Console.WriteLine($"IncreaseSpeedTo {speed}");
             ActualSpeed = Math.Min(speed, MAX_SPEED);
             _accelerating = true;
         }
 
         public void ReduceSpeed(int speed)
         {
-            //Console.WriteLine($"ReduceSpeed {speed}");
             ActualSpeed = Math.Max(speed, MIN_SPEED);
             _accelerating = false;
         }
@@ -212,7 +208,6 @@ namespace ConstructingACar
 
         public void Consume(double liters)
         {
-            //Console.WriteLine($"Engine Consume called with {liters} liters");
             if (_isRunning)
             {
                 _fuelTank.Consume(liters);
@@ -225,7 +220,6 @@ namespace ConstructingACar
 
         public void Start()
         {
-            //Console.WriteLine($"Engine Start called");
             if (_fuelTank.FillLevel > 0)
             {
                 _isRunning = true;
@@ -235,7 +229,6 @@ namespace ConstructingACar
 
         public void Stop()
         {
-            //Console.WriteLine($"Engine Stop called");
             _isRunning = false;
             _drivingProcessor.EngineStop();
         }
@@ -247,7 +240,6 @@ namespace ConstructingACar
 
         public FuelTank(double fuelLevel)
         {
-            //Console.WriteLine($"New FuelTank with fuel level: {fuelLevel}");
             _fillLevel = Math.Min(Math.Max(0, fuelLevel), MAXIMUM_FUEL_LEVEL);
         }
 
@@ -259,13 +251,11 @@ namespace ConstructingACar
 
         public void Consume(double liters)
         {
-            //Console.WriteLine($"FuelTank Consume called with {liters} liters");
             _fillLevel = Math.Max(0, _fillLevel - liters);
         }
 
         public void Refuel(double liters)
         {
-            //Console.WriteLine($"FuelTank Refuel called with {liters} liters");
             _fillLevel = Math.Min(_fillLevel + liters, MAXIMUM_FUEL_LEVEL);
         }
     }
@@ -295,6 +285,9 @@ namespace ConstructingACar
         private double _tripConsumptionByTimeSum = 0;
         private double _totalConsumptionByTimeSum = 0;
 
+        private double _tripDrivenDistanceMetres = 0;
+        private double _totalDrivenDistanceMetres = 0;
+
         private double _tripConsumptionByDistanceSum = 0;
         private double _totalConsumptionByDistanceSum = 0;
 
@@ -311,19 +304,19 @@ namespace ConstructingACar
 
         public int TripDrivingTime { get; private set; } = 0;
 
-        public int TripDrivenDistance { get; private set; } = 0;
+        public int TripDrivenDistance { get => (int)_tripDrivenDistanceMetres; } 
 
         public int TotalRealTime { get; private set; } = 0;
 
         public int TotalDrivingTime { get; private set; } = 0;
 
-        public int TotalDrivenDistance { get; private set; } = 0;
+        public int TotalDrivenDistance { get => (int)_totalDrivenDistanceMetres; } 
 
-        public double TripAverageSpeed { get { return CalculateAverageSpeed(TripDrivingTime, TripDrivenDistance); } }
+        public double TripAverageSpeed { get => CalculateAverageSpeed(TripDrivingTime, _tripDrivenDistanceMetres); } 
 
-        public double TotalAverageSpeed { get { return CalculateAverageSpeed(TotalDrivingTime, TotalDrivenDistance); } }
+        public double TotalAverageSpeed { get => CalculateAverageSpeed(TotalDrivingTime, _totalDrivenDistanceMetres); } 
 
-        public int ActualSpeed { get { return _drivingProcessor.ActualSpeed; } }
+        public int ActualSpeed { get => _drivingProcessor.ActualSpeed; } 
 
         public double ActualConsumptionByTime { get; private set; } = 0;
 
@@ -333,9 +326,9 @@ namespace ConstructingACar
 
         public double TotalAverageConsumptionByTime { get; private set; }
 
-        public double TripAverageConsumptionByDistance { get { return TripDrivingTime == 0 ? 0 : Math.Round(_tripConsumptionByDistanceSum / TripDrivingTime, 1); } }
+        public double TripAverageConsumptionByDistance { get => CalculateAverageConsumptionByDistance(TripDrivingTime, _tripConsumptionByDistanceSum); }
 
-        public double TotalAverageConsumptionByDistance { get { return TotalDrivingTime == 0 ? 0 : Math.Round(_totalConsumptionByDistanceSum / TotalDrivingTime, 1); } }
+        public double TotalAverageConsumptionByDistance { get => CalculateAverageConsumptionByDistance(TotalDrivingTime, _totalConsumptionByDistanceSum); }
 
         public int EstimatedRange { get; private set; } = 0;
 
@@ -356,24 +349,19 @@ namespace ConstructingACar
             return realTime == 0 ? 0 : consumptionByTimeSum / realTime;
         }
 
-        private double CalculateAverageSpeed(int DrivingTime, int DrivenDistance)
+        private double CalculateAverageSpeed(int DrivingTime, double DrivenDistance)
         {
-            return DrivingTime == 0 ? 0d : ((double)DrivenDistance / 100000) / ((double)DrivingTime / 3600);
+            return DrivingTime == 0 ? 0d : (DrivenDistance / 1000) / ((double)DrivingTime / 3600);
+        }
+
+        private double CalculateAverageConsumptionByDistance(int drivingTime, double consumptionByDistanceSum)
+        { 
+            return drivingTime == 0 ? 0 : Math.Round(consumptionByDistanceSum / drivingTime, 1); 
         }
 
         private int CalculateEstimatedRange()
         {
             int EstimatedRange = 0;
-            // remove the oldest consumption value and add the current one
-            // _consumptionForLast100Seconds.Dequeue();
-            // _consumptionForLast100Seconds.Enqueue(_drivingProcessor.ActualConsumption);
-            // var totalConsumption = _consumptionForLast100Seconds.Sum(x => x);
-
-            // double secondsOfFuelRemaining = 100 * _fuelTank.FillLevel / totalConsumption;
-
-            // EstimatedRange = (int)Math.Round((secondsOfFuelRemaining / 3600) * _drivingProcessor.ActualSpeed);
-
-            //Console.WriteLine($"AverageConsumption: {_consumptionForLast100Seconds.Sum(x => x)}, FillLevel: {_fuelTank.FillLevel}");
             if (_drivingProcessor.ActualSpeed > 0)
             {
                 // remove the oldest consumption value and add the current one
@@ -383,11 +371,8 @@ namespace ConstructingACar
             }
             EstimatedRange = (int)Math.Round(_fuelTank.FillLevel / _consumptionForLast100Seconds.Average(x => x));
 
-            return EstimatedRange;
-           // return (int)Math.Round(_fuelTank.FillLevel / _consumptionForLast100Seconds.Average(x => x));
+            return EstimatedRange;           
         }
-
-        //private double _tripDistanceKM = 0;
 
         public void ElapseSecond()
         {
@@ -403,13 +388,11 @@ namespace ConstructingACar
                 _tripSpeed += _drivingProcessor.ActualSpeed;
                 _totalSpeed += _drivingProcessor.ActualSpeed;
                 secondsRequiredToDrive100Km = 3600 * 100 / _drivingProcessor.ActualSpeed;
-                int distanceInElapsedSecondInCentMetres = (int)Math.Round((100000d * (double)_drivingProcessor.ActualSpeed) / 3600);
-                TripDrivenDistance += (distanceInElapsedSecondInCentMetres);
-                TotalDrivenDistance += (distanceInElapsedSecondInCentMetres);
+                double distanceInElapsedSecondInMetres = (1000d * (double)_drivingProcessor.ActualSpeed) / 3600;
+                _tripDrivenDistanceMetres += (distanceInElapsedSecondInMetres);
+                _totalDrivenDistanceMetres += (distanceInElapsedSecondInMetres);
 
                 double distanceInElapsedSecond = ((double)_drivingProcessor.ActualSpeed) / 3600;
-                //_tripDistanceKM += distanceInElapsedSecond;
-
             }
             ActualConsumptionByDistance = TripDrivingTime == 0 ? double.NaN : secondsRequiredToDrive100Km * ActualConsumptionByTime;
             _tripConsumptionByTimeSum += ActualConsumptionByTime;
@@ -430,7 +413,7 @@ namespace ConstructingACar
         {
             TripRealTime = 0;
             TripDrivingTime = 0;
-            TripDrivenDistance = 0;
+            _tripDrivenDistanceMetres = 0;
             _tripSpeed = 0;
             _tripConsumptionByTimeSum = 0;
             _tripConsumptionByDistanceSum = 0;
@@ -440,10 +423,9 @@ namespace ConstructingACar
 
         public void TotalReset()
         {
-            //TripReset();
             TotalRealTime = 0;
             TotalDrivingTime = 0;
-            TotalDrivenDistance = 0;
+            _totalDrivenDistanceMetres = 0;
             _totalSpeed = 0;
             _totalConsumptionByTimeSum = 0;
             _totalConsumptionByDistanceSum = 0;
@@ -458,48 +440,41 @@ namespace ConstructingACar
         {
             _onBoardComputer = onBoardComputer;
         }
-         public int TripRealTime { get { Console.WriteLine("TripRealTime"); return _onBoardComputer.TripRealTime; } }
 
-        public int TripDrivingTime { get { Console.WriteLine("TripDrivingTime"); return _onBoardComputer.TripDrivingTime; } }
+        private double formatDrivenDistance(int DrivenDistanceInMetres) => Math.Round(((double)DrivenDistanceInMetres / 1000), 2);
+        public int TripRealTime { get => _onBoardComputer.TripRealTime; }
 
-        public double TripDrivenDistance { get { return Math.Round(((double)_onBoardComputer.TripDrivenDistance / 100000), 2); } }
+        public int TripDrivingTime { get => _onBoardComputer.TripDrivingTime; }
 
-        public int TotalRealTime { get { Console.WriteLine("TotalRealTime"); return _onBoardComputer.TotalRealTime; } }
+        public double TripDrivenDistance { get => formatDrivenDistance(_onBoardComputer.TripDrivenDistance); }
 
-        public int TotalDrivingTime {  get { Console.WriteLine("TotalRealTime"); return _onBoardComputer.TotalDrivingTime; } }
+        public int TotalRealTime { get => _onBoardComputer.TotalRealTime; } 
 
-        public double TotalDrivenDistance { get { return Math.Round(((double)_onBoardComputer.TotalDrivenDistance / 100000), 2); } }
+        public int TotalDrivingTime {  get => _onBoardComputer.TotalDrivingTime; } 
+        public double TotalDrivenDistance { get => formatDrivenDistance(_onBoardComputer.TotalDrivenDistance); } 
 
-        public int ActualSpeed { get { return _onBoardComputer.ActualSpeed; } }
+        public int ActualSpeed { get => _onBoardComputer.ActualSpeed; } 
 
-        public double TripAverageSpeed { get { return Math.Round(_onBoardComputer.TripAverageSpeed, 1); } }
+        public double TripAverageSpeed { get => Math.Round(_onBoardComputer.TripAverageSpeed, 1); } 
 
-        public double TotalAverageSpeed { get { return Math.Round(_onBoardComputer.TotalAverageSpeed, 1); } }
+        public double TotalAverageSpeed { get => Math.Round(_onBoardComputer.TotalAverageSpeed, 1); }
 
-        public double ActualConsumptionByTime { get { return _onBoardComputer.ActualConsumptionByTime; } }
+        public double ActualConsumptionByTime { get => _onBoardComputer.ActualConsumptionByTime; } 
 
-        public double ActualConsumptionByDistance { get { return Math.Round(_onBoardComputer.ActualConsumptionByDistance, 1); } }
+        public double ActualConsumptionByDistance { get => Math.Round(_onBoardComputer.ActualConsumptionByDistance, 1); } 
 
-        public double TripAverageConsumptionByTime { get { Console.WriteLine("TripAverageConsumptionByTime"); return Math.Round(_onBoardComputer.TripAverageConsumptionByTime, 5); } }        
+        public double TripAverageConsumptionByTime { get => Math.Round(_onBoardComputer.TripAverageConsumptionByTime, 5); }        
 
-        public double TotalAverageConsumptionByTime { get { Console.WriteLine("TotalAverageConsumptionByTime"); return Math.Round(_onBoardComputer.TotalAverageConsumptionByTime, 5); } }
+        public double TotalAverageConsumptionByTime { get => Math.Round(_onBoardComputer.TotalAverageConsumptionByTime, 5); } 
 
-        public double TripAverageConsumptionByDistance { get { return Math.Round(_onBoardComputer.TripAverageConsumptionByDistance, 1); } }
+        public double TripAverageConsumptionByDistance { get => Math.Round(_onBoardComputer.TripAverageConsumptionByDistance, 1); } 
 
-        public double TotalAverageConsumptionByDistance { get { return Math.Round(_onBoardComputer.TotalAverageConsumptionByDistance, 1); } }
+        public double TotalAverageConsumptionByDistance { get => Math.Round(_onBoardComputer.TotalAverageConsumptionByDistance, 1); } 
 
-        public int EstimatedRange { get { return _onBoardComputer.EstimatedRange; } }
+        public int EstimatedRange { get => _onBoardComputer.EstimatedRange; } 
 
-        public void TripReset()
-        {
-            Console.WriteLine("TripReset");
-            _onBoardComputer.TripReset();            
-        }
+        public void TripReset() => _onBoardComputer.TripReset(); 
 
-        public void TotalReset()
-        {
-            Console.WriteLine("TotalReset"); 
-            _onBoardComputer.TotalReset();            
-        }
+        public void TotalReset() => _onBoardComputer.TotalReset();            
     }
 }
