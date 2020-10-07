@@ -485,6 +485,19 @@ namespace ConstructingACar.Test
             Assert.AreEqual(0.00182d, car.onBoardComputerDisplay.TotalAverageConsumptionByTime, "Wrong Total-Average-Consumption-By-Time");
             Assert.AreEqual(30.7d, car.onBoardComputerDisplay.TripAverageConsumptionByDistance, "Wrong Trip-Average-Consumption-By-Distance");
             Assert.AreEqual(30.7d, car.onBoardComputerDisplay.TotalAverageConsumptionByDistance, "Wrong Total-Average-Consumption-By-Distance");
+           
+        }
+
+        [Test]
+        public void Car4RandomTests()
+        {
+            var car = new Car();
+
+            car.EngineStart();
+
+            Enumerable.Range(0, 11).ToList().ForEach(c => car.Accelerate(29));
+
+            Assert.AreEqual(26.5d, car.onBoardComputerDisplay.TripAverageSpeed, "Wrong Trip-Average-Speed.");
         }
     }
 }

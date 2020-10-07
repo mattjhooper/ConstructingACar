@@ -403,7 +403,7 @@ namespace ConstructingACar
                 _tripSpeed += _drivingProcessor.ActualSpeed;
                 _totalSpeed += _drivingProcessor.ActualSpeed;
                 secondsRequiredToDrive100Km = 3600 * 100 / _drivingProcessor.ActualSpeed;
-                int distanceInElapsedSecondInCentMetres = 100000 * _drivingProcessor.ActualSpeed / 3600;
+                int distanceInElapsedSecondInCentMetres = (int)Math.Round((100000d * (double)_drivingProcessor.ActualSpeed) / 3600);
                 TripDrivenDistance += (distanceInElapsedSecondInCentMetres);
                 TotalDrivenDistance += (distanceInElapsedSecondInCentMetres);
 
@@ -411,7 +411,7 @@ namespace ConstructingACar
                 //_tripDistanceKM += distanceInElapsedSecond;
 
             }
-            ActualConsumptionByDistance = TripDrivingTime == 0 ? double.NaN : Math.Round(secondsRequiredToDrive100Km * ActualConsumptionByTime, 1);
+            ActualConsumptionByDistance = TripDrivingTime == 0 ? double.NaN : secondsRequiredToDrive100Km * ActualConsumptionByTime;
             _tripConsumptionByTimeSum += ActualConsumptionByTime;
             _totalConsumptionByTimeSum += ActualConsumptionByTime;
             if (!double.IsNaN(ActualConsumptionByDistance))
@@ -478,7 +478,7 @@ namespace ConstructingACar
 
         public double ActualConsumptionByTime { get { return _onBoardComputer.ActualConsumptionByTime; } }
 
-        public double ActualConsumptionByDistance { get { return _onBoardComputer.ActualConsumptionByDistance; } }
+        public double ActualConsumptionByDistance { get { return Math.Round(_onBoardComputer.ActualConsumptionByDistance, 1); } }
 
         public double TripAverageConsumptionByTime { get { Console.WriteLine("TripAverageConsumptionByTime"); return Math.Round(_onBoardComputer.TripAverageConsumptionByTime, 5); } }        
 
